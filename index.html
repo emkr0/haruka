@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haruka Shop - v4</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ตัวแปรโทนสีหลัก (Color Palette) --- */
+        :root {
+            --bg-dark: #3B2527;
+            --text-muted: #7F6B6D;
+            --accent-pink: #EFBBC7;
+            --glass-bg: rgba(254, 252, 255, 0.5);
+            --glass-border: rgba(239, 187, 199, 0.5);
+            --font-main: 'Mitr', 'Prompt', sans-serif;
+        }
+
+        /* --- การตั้งค่าพื้นฐาน & เอฟเฟกต์การเลื่อนหน้าจอ --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-family: var(--font-main);
+            color: var(--bg-dark);
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* พื้นหลัง Dreamy Sky Pink Glow */
+        body {
+            min-height: 100vh;
+            padding-bottom: 120px; /* เว้นพื้นที่ให้แถบเครื่องเล่นเพลง */
+            background-color: #fefcff;
+            background-image: 
+                radial-gradient(circle at 30% 70%, rgba(173, 216, 230, 0.35), transparent 60%),
+                radial-gradient(circle at 70% 30%, rgba(255, 182, 193, 0.4), transparent 60%);
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        /* แอนิเมชันเปิดเว็บแบบนุ่มนวลสมดุล */
+        .bounce-in {
+            animation: fadeInStable 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        @keyframes fadeInStable {
+            0% { transform: translateY(15px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* --- สไตล์ Liquid Glass Effect --- */
+        .liquid-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px) saturate(110%);
+            -webkit-backdrop-filter: blur(12px) saturate(110%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 6px 20px 0 rgba(127, 107, 109, 0.08), 
+                        inset 0 2px 6px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- แถบเครดิตร้านด้านบนสุด (Top Info Bar) --- */
+        .top-credit-bar {
+            width: 100%;
+            padding: 10px 16px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--bg-dark);
+            font-weight: 500;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(254, 252, 255, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 10;
+            position: relative;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- ส่วนเนื้อหาหลัก ควบคุมระยะห่างจากจอให้สมดุลเท่ากันทุกด้าน --- */
+        .main-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* แบนเนอร์หลัก */
+        .banner-container {
+            width: 100%;
+        }
+
+        .banner-link {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(127, 107, 109, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .banner-link img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .banner-link:hover {
+            transform: scale(1.01);
+        }
+        .banner-link:hover img {
+            transform: scale(1.02);
+        }
+
+        /* --- โปรไฟล์ & ข้อมูลร้าน --- */
+        .profile-section {
+            text-align: center;
+            margin-top: -40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .profile-img-wrapper {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 12px auto;
+            border-radius: 50%;
+            padding: 4px;
+            background: white;
+            box-shadow: 0 6px 15px rgba(127, 107, 109, 0.12);
+            transition: transform 0.3s ease;
+        }
+        .profile-img-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .shop-name {
+            font-size: 1.6rem;
+            color: var(--bg-dark);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .bio-container {
+            width: 100%;
+            padding: 16px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* --- ระบบนาฬิกาญี่ปุ่น --- */
+        .clock-container {
+            width: 100%;
+            padding: 14px;
+            text-align: center;
+        }
+
+        #japan-clock {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--bg-dark);
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .clock-subtext {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* --- สไลเดอร์รูปภาพ --- */
+        .slider-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(127, 107, 109, 0.08);
+            touch-action: pan-y;
+        }
+
+        .slider-track {
+            display: flex;
+            width: 100%;
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .slide {
+            min-width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .dots-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #E2D4D6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: var(--bg-dark);
+            transform: scale(1.1);
+        }
+
+        /* --- โซนที่คั่นดีไซน์ใหม่ สีเข้ม มินิมอลสไตล์ญี่ปุ่น (Custom Dark Elegant Divider) --- */
+        .kawaii-divider-container {
+            width: 100%;
+            text-align: center;
+            user-select: none;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to var(--bg-dark), rgba(94, 75, 77, 0.2));
+            opacity: 0.25;
+        }
+        .divider-line.left {
+            background: linear-gradient(to left, rgba(59, 37, 39, 0.6), transparent);
+        }
+        .divider-line.right {
+            background: linear-gradient(to right, rgba(59, 37, 39, 0.6), transparent);
+        }
+
+        .kawaii-divider-center {
+            font-size: 1rem;
+            color: var(--bg-dark); /* ใช้สีน้ำตาลเข้มหลักเพื่อความคมชัดและกลมกลืน */
+            font-weight: 400;
+            letter-spacing: 3px;
+            opacity: 0.85;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* --- โซนเมนูผลงาน --- */
+        .menu-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .top-featured-box {
+            width: 100%;
+        }
+
+        .top-featured-box .card-img-wrapper {
+            aspect-ratio: 16 / 9;
+        }
+
+        .menu-grid-two-columns {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .menu-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            overflow: hidden;
+            border-radius: 14px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(127, 107, 109, 0.1);
+        }
+
+        .card-img-wrapper {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-title {
+            padding: 10px 4px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.85rem;
+            background: rgba(254, 252, 255, 0.4);
+            border-top: 1px solid var(--glass-border);
+            color: var(--bg-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* --- ส่วนท้ายเว็บ & คอนแท็ก --- */
+        footer {
+            width: 100%;
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .contact-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            text-decoration: none;
+            color: var(--bg-dark);
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: transform 0.2s ease;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .footer-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* --- แถบเครื่องเล่นเพลงมินิมอล ล็อกด้านล่างสุด --- */
+        .audio-player-bar {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 450px;
+            padding: 10px 16px;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 20px;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .music-icon-animation {
+            font-size: 1.2rem;
+            animation: spinning 4s linear infinite;
+            animation-play-state: paused;
+            flex-shrink: 0;
+        }
+
+        .audio-player-bar.playing .music-icon-animation {
+            animation-play-state: running;
+        }
+
+        .track-details {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .track-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--bg-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-artist {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-controls {
+            flex-shrink: 0;
+        }
+
+        .player-controls button {
+            background: var(--bg-dark);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(59, 37, 39, 0.15);
+            transition: transform 0.2s ease;
+        }
+
+        .player-controls button:hover {
+            transform: scale(1.05);
+        }
+
+        .player-controls button svg {
+            fill: currentColor;
+            width: 14px;
+            height: 14px;
+        }
+
+        @keyframes spinning {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-credit-bar">
+        <span>กดเพื่อดูเครดิตร้าน</span>
+    </div>
+
+    <div class="main-container">
+
+        <div class="banner-container bounce-in">
+            <a href="https://www.facebook.com/share/p/1EuSyq6iZe/?mibextid=wwXIfr" target="_blank" class="banner-link">
+                <img src="https://i.postimg.cc/CKG1fXvL/mi-m-ch-x-31-20260705115001.png" alt="Haruka Shop Banner">
+            </a>
+        </div>
+
+        <div class="profile-section bounce-in">
+            <div class="profile-img-wrapper">
+                <img src="https://i.postimg.cc/VkS3dZR1/โปรไฟล์.png" alt="Haruka Profile">
+            </div>
+            <h1 class="shop-name">Haruka</h1>
+            <div class="bio-container liquid-glass">
+                <p style="font-weight: 500;">รองาน 1-3 วันต่องาน ไม่รวมรอคิว</p>
+                <p style="margin-top: 4px; font-size: 0.88rem; color: var(--text-muted);">ไม่ดองงานค่ะ เวลาว่างไม่ค่อยเยอะ แต่จะส่งงานตามกำหนดแน่นอน</p>
+            </div>
+        </div>
+
+        <div class="clock-container liquid-glass bounce-in">
+            <div id="japan-clock">00:00:00</div>
+            <div class="clock-subtext">JAPAN TIME</div>
+            <div class="clock-subtext" style="font-size: 0.75rem; margin-top: 4px; color: #9E8587;">
+                ฮารุกะใช้ไทม์โซนญี่ปุ่น แต่ส่งงานตรงตามเวลาไทยค่ะ
+            </div>
+        </div>
+
+        <div class="slider-section bounce-in">
+            <div class="slider-wrapper" id="slider-wrapper">
+                <div class="slider-track" id="slider-track">
+                    <div class="slide"><img src="https://i.postimg.cc/kXBQySg0/mi-m-ch-x-431-20260711004801.png" alt="Work 1"></div>
+                    <div class="slide"><img src="https://i.postimg.cc/zX6n2fyP/mi-m-ch-x-432-20260711005819.png" alt="Work 2"></div>
+                    <div class="slide"><img src="https://i.postimg.cc/qMzsGKvF/mi-m-ch-x-430-20260711004417.png" alt="Work 3"></div>
+                    <div class="slide"><img src="https://i.postimg.cc/j5cHMQfM/mi-m-ch-x-429-20260711003641.png" alt="Work 4"></div>
+                </div>
+            </div>
+            <div class="dots-container" id="dots-container"></div>
+        </div>
+
+        <div class="kawaii-divider-container bounce-in">
+            <div class="divider-line left"></div>
+            <div class="kawaii-divider-center">
+                <span>✦</span>
+                <span>◦</span>
+                <span>✦</span>
+            </div>
+            <div class="divider-line right"></div>
+        </div>
+
+        <div class="menu-section bounce-in">
+            
+            <div class="top-featured-box">
+                <a href="https://drive.google.com/drive/folders/1X3tvQc6_Poc9Q523mN3CQaOM3t3xltPp" target="_blank" class="menu-card liquid-glass">
+                    <div class="card-img-wrapper">
+                        <img src="https://i.postimg.cc/8PZtwDGL/IMG-6280.jpg" alt="my work">
+                    </div>
+                    <div class="card-title" style="font-weight: 500; font-size: 0.95rem;">my work</div>
+                </a>
+            </div>
+
+            <div class="menu-grid-two-columns">
+                
+                <a href="https://drive.google.com/drive/folders/1zSVCU9dpghegGbHj0IhEaDjeyNO_wT0j" target="_blank" class="menu-card liquid-glass">
+                    <div class="card-img-wrapper">
+                        <img src="https://i.postimg.cc/BQmMNs3t/IMG-6281.jpg" alt="งานปล่อยเอฟ">
+                    </div>
+                    <div class="card-title">งานปล่อยเอฟ</div>
+                </a>
+
+                <a href="https://drive.google.com/drive/folders/1epMHB0WTgYSCbrSHronJbJbJpI9wKrf6R0" target="_blank" class="menu-card liquid-glass">
+                    <div class="card-img-wrapper">
+                        <img src="https://i.postimg.cc/ZKbwrnGp/IMG-6283.jpg" alt="เลือกบล็อก">
+                    </div>
+                    <div class="card-title">เลือกบล็อก</div>
+                </a>
+
+                <a href="https://drive.google.com/drive/folders/1JqBLajnCWnw0pGwsdy_UfSqUgTeUUikd" target="_blank" class="menu-card liquid-glass">
+                    <div class="card-img-wrapper">
+                        <img src="https://i.postimg.cc/CLcmJY01/IMG-6284.jpg" alt="เลือกตูน">
+                    </div>
+                    <div class="card-title">เลือกตูน</div>
+                </a>
+
+                <a href="https://drive.google.com/drive/folders/1ZM_69S2KLLvY17wgqjgY1UhRriEZN83G" target="_blank" class="menu-card liquid-glass">
+                    <div class="card-img-wrapper">
+                        <img src="https://i.postimg.cc/WbN5MzBr/IMG-6285.jpg" alt="เลือกของตกแต่ง">
+                    </div>
+                    <div class="card-title">เลือกของตกแต่ง</div>
+                </a>
+
+                <a href="https://drive.google.com/drive/folders/1g-dgOK49QZW8v9GN8tyi_Gn7_7F19gfu" target="_blank" class="menu-card liquid-glass">
+                    <div class="card-img-wrapper">
+                        <img src="https://i.postimg.cc/gkzgvjCm/IMG-6286.jpg" alt="เลือกแนวฟอนต์/หัวป้าย">
+                    </div>
+                    <div class="card-title">เลือกแนวฟอนต์/หัวป้าย</div>
+                </a>
+
+                <a href="https://drive.google.com/drive/folders/1xCZVqeQqkDlbj5ID0kbvxyR8STbihTr_" target="_blank" class="menu-card liquid-glass">
+                    <div class="card-img-wrapper">
+                        <img src="https://i.postimg.cc/15vJMPS6/IMG-6287.jpg" alt="เลือกฟอนต์">
+                    </div>
+                    <div class="card-title">เลือกฟอนต์</div>
+                </a>
+
+            </div>
+        </div>
+
+        <footer class="liquid-glass bounce-in">
+            <div class="contact-buttons">
+                <a href="https://www.facebook.com/share/1JaTYw8S9B/?mibextid=wwXIfr" target="_blank" class="contact-btn liquid-glass">
+                    <img src="https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/facebook/default.svg" alt="Facebook" width="20" height="20"/>
+                    <span>Facebook</span>
+                </a>
+                <a href="https://line.me/ti/p/Z4nBI108Gc" target="_blank" class="contact-btn liquid-glass">
+                    <img src="https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/line/default.svg" alt="LINE" width="20" height="20"/>
+                    <span>LINE</span>
+                </a>
+            </div>
+            <p class="footer-text">ขอบคุณสำหรับทุกการสนับสนุนค่ะ @haruka_</p>
+        </footer>
+
+    </div> <div class="audio-player-bar liquid-glass" id="player-bar">
+        <div class="player-info">
+            <div class="music-icon-animation">🎵</div>
+            <div class="track-details">
+                <span class="track-name">Pardyalone - not a home (feat. Smew)</span>
+                <span class="track-artist">ฟังเพลินๆระหว่างเลือกนะคะ</span>
+            </div>
+        </div>
+        <div class="player-controls">
+            <button id="play-btn" aria-label="Play Music">
+                <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <audio id="bgm-audio" src="https://files.catbox.moe/mrx112.mp4" loop prefetch="auto"></audio>
+
+    <script>
+        /* 1. ระบบนาฬิกา Realtime ประเทศญี่ปุ่น */
+        function updateJapanClock() {
+            const now = new Date();
+            const japanTimeStr = now.toLocaleTimeString('en-US', {
+                timeZone: 'Asia/Tokyo',
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('japan-clock').textContent = japanTimeStr;
+        }
+        updateJapanClock();
+        setInterval(updateJapanClock, 1000);
+
+        /* 2. ระบบสไลเดอร์รูปภาพ */
+        const track = document.getElementById('slider-track');
+        const wrapper = document.getElementById('slider-wrapper');
+        const slides = Array.from(track.children);
+        const dotsContainer = document.getElementById('dots-container');
+        let currentIndex = 0;
+        let slideInterval;
+
+        slides.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(index));
+            dotsContainer.appendChild(dot);
+        });
+        const dots = Array.from(dotsContainer.children);
+
+        function updateSliderPosition() {
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentIndex);
+            });
+        }
+
+        function nextSlide() {
+            if (currentIndex < slides.length - 1) currentIndex++;
+            else currentIndex = 0;
+            updateSliderPosition();
+        }
+
+        function goToSlide(index) {
+            currentIndex = index;
+            updateSliderPosition();
+            resetAutoplay();
+        }
+
+        function startAutoplay() {
+            slideInterval = setInterval(nextSlide, 3000);
+        }
+
+        function resetAutoplay() {
+            clearInterval(slideInterval);
+            startAutoplay();
+        }
+        startAutoplay();
+
+        // Touch Events
+        let startX = 0, currentX = 0, isDragging = false;
+        wrapper.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; isDragging = true; clearInterval(slideInterval); }, {passive: true});
+        wrapper.addEventListener('touchmove', (e) => { if (!isDragging) return; currentX = e.touches[0].clientX; }, {passive: true});
+        wrapper.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            const diffX = startX - currentX;
+            if (Math.abs(diffX) > 40 && currentX !== 0) {
+                if (diffX > 0) currentIndex = (currentIndex < slides.length - 1) ? currentIndex + 1 : 0;
+                else currentIndex = (currentIndex > 0) ? currentIndex - 1 : slides.length - 1;
+                updateSliderPosition();
+            }
+            isDragging = false; currentX = 0; resetAutoplay();
+        });
+
+        // Mouse Events
+        wrapper.addEventListener('mousedown', (e) => { startX = e.clientX; isDragging = true; clearInterval(slideInterval); });
+        window.addEventListener('mousemove', (e) => { if (!isDragging) return; currentX = e.clientX; });
+        window.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            const diffX = startX - currentX;
+            if (Math.abs(diffX) > 40 && currentX !== 0) {
+                if (diffX > 0) currentIndex = (currentIndex < slides.length - 1) ? currentIndex + 1 : 0;
+                else currentIndex = (currentIndex > 0) ? currentIndex - 1 : slides.length - 1;
+                updateSliderPosition();
+            }
+            isDragging = false; currentX = 0; resetAutoplay();
+        });
+
+        /* 3. ระบบควบคุมเพลง */
+        const audio = document.getElementById('bgm-audio');
+        const playBtn = document.getElementById('play-btn');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const playerBar = document.getElementById('player-bar');
+
+        playBtn.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    playerBar.classList.add('playing');
+                    playIcon.style.display = 'none';
+                    pauseIcon.style.display = 'block';
+                }).catch((error) => { console.log("Playback blocked:", error); });
+            } else {
+                audio.pause();
+                playerBar.classList.remove('playing');
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
